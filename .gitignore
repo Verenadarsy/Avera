@@ -1,0 +1,83 @@
+# ------------------------------
+# 🔧 General
+# ------------------------------
+*.class
+*.log
+*.pyc
+*.swp
+.DS_Store
+.atom/
+.build/
+.buildlog/
+.history
+.svn/
+.swiftpm/
+migrate_working_dir/
+.metadata
+
+# ------------------------------
+# 💡 IDE Related
+# ------------------------------
+*.iml
+*.ipr
+*.iws
+.idea/
+.vscode/
+*.orig
+
+# ------------------------------
+# 🐦 Flutter / Dart Related
+# ------------------------------
+.dart_tool/
+.flutter-plugins
+.flutter-plugins-dependencies
+.packages
+.pub-cache/
+.pub/
+build/
+coverage/
+generated_plugin_registrant.dart
+
+# ------------------------------
+# 📱 Platform Builds
+# ------------------------------
+
+# ✅ Keep Android (biar bisa build di HP)
+# Ignore only generated artifacts inside Android
+/android/app/debug
+/android/app/profile
+/android/app/release
+/android/local.properties
+
+# ❌ Ignore other platforms (karena fokus ke Android + Web)
+/ios/
+/macos/
+/linux/
+/windows/
+
+# ------------------------------
+# 🌐 Web Build
+# ------------------------------
+web/.dart_tool/
+web/.idea/
+web/.vscode/
+build/web/
+
+# ------------------------------
+# 🧠 Symbolication / Obfuscation
+# ------------------------------
+app.*.symbols
+app.*.map.json
+
+# ------------------------------
+# ⚙️ Local Environment Config
+# ------------------------------
+.env
+*.lock
+*.bak
+*.tmp
+
+# ------------------------------
+# 🧪 Testing (optional)
+# ------------------------------
+test/
