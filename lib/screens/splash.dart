@@ -1,6 +1,6 @@
 import 'dart:async';
+import 'package:avera/widgets/nav.dart';
 import 'package:flutter/material.dart';
-import 'dashboard.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -39,7 +39,7 @@ class _SplashScreenState extends State<SplashScreen>
     Timer(const Duration(seconds: 5), () {
       Navigator.pushReplacement(
         context,
-        MaterialPageRoute(builder: (context) => const DashboardScreen()),
+        MaterialPageRoute(builder: (context) => const Nav()),
       );
     });
   }
