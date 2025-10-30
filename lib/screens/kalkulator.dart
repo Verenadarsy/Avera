@@ -145,7 +145,7 @@ class _KalkulatorScreenState extends State<KalkulatorScreen> {
           child: InkWell(
             onTap: onTap,
             borderRadius: BorderRadius.circular(100),
-            splashColor: Colors.white.withOpacity(0.1),
+            splashColor: Colors.white.withValues(alpha: 0.1),
             child: Center(
               child: Text(
                 label,
@@ -180,7 +180,7 @@ class _KalkulatorScreenState extends State<KalkulatorScreen> {
           child: InkWell(
             onTap: onTap,
             borderRadius: BorderRadius.circular(100),
-            splashColor: Colors.white.withOpacity(0.1),
+            splashColor: Colors.white.withValues(alpha: 0.1),
             child: Center(
               child: Text(
                 label,

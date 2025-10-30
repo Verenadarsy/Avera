@@ -34,71 +34,101 @@ class _NavState extends State<Nav> {
 
   @override
   Widget build(BuildContext context) {
-    // Mengambil status dark mode dari DashboardScreen
     final isDarkMode = DashboardScreenState.getDarkMode;
 
     return Scaffold(
+      extendBody: true, // <— ini WAJIB kalau mau efek “melayang”
       body: _screens[_selectedIndex],
       bottomNavigationBar: Container(
+        margin: const EdgeInsets.all(20),
+        padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 8),
         decoration: BoxDecoration(
+          color: isDarkMode ? const Color(0xFF1E1E1E) : Colors.white, // solid!
+          borderRadius: BorderRadius.circular(30),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.1),
-              blurRadius: 10,
-              offset: const Offset(0, -5),
+              color: Colors.black.withValues(alpha: 0.25),
+              blurRadius: 30,
+              offset: const Offset(0, 8),
             ),
           ],
         ),
-        child: BottomNavigationBar(
-          type: BottomNavigationBarType.fixed,
-          currentIndex: _selectedIndex,
-          onTap: _onItemTapped,
-          backgroundColor: isDarkMode ? const Color(0xFF1E1E1E) : Colors.white,
-          selectedItemColor: isDarkMode
-              ? Colors.blue.shade300
-              : Colors.blue.shade700,
-          unselectedItemColor: isDarkMode
-              ? Colors.grey.shade600
-              : Colors.grey.shade400,
-          showUnselectedLabels: true,
-          elevation: 0,
-          selectedLabelStyle: const TextStyle(
-            fontWeight: FontWeight.w600,
-            fontSize: 12,
-          ),
-          unselectedLabelStyle: const TextStyle(fontSize: 12),
-          items: const [
-            BottomNavigationBarItem(
-              icon: Icon(Icons.home_outlined),
-              activeIcon: Icon(Icons.home),
-              label: 'Home',
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceAround,
+          children: [
+            _buildNavButton(Icons.home_outlined, Icons.home, 0, isDarkMode),
+            _buildNavButton(Icons.cloud_outlined, Icons.cloud, 1, isDarkMode),
+            _buildNavButton(
+              Icons.calculate_outlined,
+              Icons.calculate,
+              2,
+              isDarkMode,
             ),
-            BottomNavigationBarItem(
-              icon: Icon(Icons.cloud_outlined),
-              activeIcon: Icon(Icons.cloud),
-              label: 'Cuaca',
+            _buildNavButton(
+              Icons.article_outlined,
+              Icons.article,
+              3,
+              isDarkMode,
             ),
-            BottomNavigationBarItem(
-              icon: Icon(Icons.calculate_outlined),
-              activeIcon: Icon(Icons.calculate),
-              label: 'Kalkulator',
-            ),
-            BottomNavigationBarItem(
-              icon: Icon(Icons.article_outlined),
-              activeIcon: Icon(Icons.article),
-              label: 'Berita',
-            ),
-            BottomNavigationBarItem(
-              icon: Icon(Icons.person_outline),
-              activeIcon: Icon(Icons.person),
-              label: 'Biodata',
-            ),
-            BottomNavigationBarItem(
-              icon: Icon(Icons.contacts_outlined),
-              activeIcon: Icon(Icons.contacts),
-              label: 'Kontak',
+            _buildNavButton(Icons.person_outline, Icons.person, 4, isDarkMode),
+            _buildNavButton(
+              Icons.contacts_outlined,
+              Icons.contacts,
+              5,
+              isDarkMode,
             ),
           ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildNavButton(
+    IconData inactiveIcon,
+    IconData activeIcon,
+    int index,
+    bool isDarkMode,
+  ) {
+    final isSelected = _selectedIndex == index;
+
+    return GestureDetector(
+      onTap: () => _onItemTapped(index),
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 250),
+        curve: Curves.easeInOut,
+        padding: const EdgeInsets.all(12),
+        decoration: BoxDecoration(
+          // efek bulat glow hanya untuk icon aktif
+          gradient: isSelected
+              ? LinearGradient(
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                  colors: isDarkMode
+                      ? [const Color(0xFF60D5FD), const Color(0xFF4A90E2)]
+                      : [const Color(0xFF4A90E2), const Color(0xFF60D5FD)],
+                )
+              : null,
+          borderRadius: BorderRadius.circular(20),
+          boxShadow: isSelected
+              ? [
+                  BoxShadow(
+                    color: isDarkMode
+                        ? const Color(0xFF60D5FD).withValues(alpha: 0.4)
+                        : const Color(0xFF4A90E2).withValues(alpha: 0.3),
+                    blurRadius: 15,
+                    offset: const Offset(0, 4),
+                  ),
+                ]
+              : null,
+        ),
+        child: Icon(
+          isSelected ? activeIcon : inactiveIcon,
+          color: isSelected
+              ? Colors.white
+              : isDarkMode
+              ? Colors.grey.shade500
+              : Colors.grey.shade400,
+          size: 26,
         ),
       ),
     );

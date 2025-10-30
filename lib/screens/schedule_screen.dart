@@ -1,9 +1,10 @@
 // lib/screens/schedule_screen.dart
 
 import 'package:flutter/material.dart';
-import '../data/data_schedule.dart'; // Menggunakan dailySchedule (non-final)
+import '../data/data_schedule.dart';
+import '../styles/app_theme.dart';
 import 'dashboard.dart';
-import 'detail_schedule_screen.dart'; // Import DetailScheduleScreen
+import 'detail_schedule_screen.dart';
 
 class ScheduleScreen extends StatefulWidget {
   const ScheduleScreen({super.key});
@@ -12,56 +13,184 @@ class ScheduleScreen extends StatefulWidget {
   State<ScheduleScreen> createState() => _ScheduleScreenState();
 }
 
-class _ScheduleScreenState extends State<ScheduleScreen> {
-  // Metode untuk menampilkan dialog TAMBAH jadwal
+class _ScheduleScreenState extends State<ScheduleScreen>
+    with SingleTickerProviderStateMixin {
+  late AnimationController _animationController;
+
+  @override
+  void initState() {
+    super.initState();
+    _animationController = AnimationController(
+      duration: const Duration(milliseconds: 300),
+      vsync: this,
+    );
+  }
+
+  @override
+  void dispose() {
+    _animationController.dispose();
+    super.dispose();
+  }
+
   void _addScheduleItem() {
     final timeController = TextEditingController();
     final activityController = TextEditingController();
+    final isDarkMode = DashboardScreenState.getDarkMode;
+    final theme = AppTheme.getTheme(isDarkMode);
 
     showDialog(
       context: context,
       builder: (context) {
         return AlertDialog(
-          title: const Text("Tambah Jadwal Baru"),
+          backgroundColor: theme.cardColor,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(20),
+          ),
+          title: Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(10),
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    colors: [
+                      AppTheme.darkBlueMedium.withValues(alpha: 0.3),
+                      AppTheme.darkCyan.withValues(alpha: 0.3),
+                    ],
+                  ),
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Icon(
+                  Icons.add_circle_outline_rounded,
+                  color: AppTheme.darkCyan,
+                  size: 22,
+                ),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Text(
+                  "Tambah Jadwal Baru",
+                  style: TextStyle(
+                    color: theme.textColor,
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
+            ],
+          ),
           content: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
               TextField(
                 controller: timeController,
-                decoration: const InputDecoration(labelText: "Waktu (HH.MM)"),
+                style: TextStyle(color: theme.textColor),
+                decoration: InputDecoration(
+                  labelText: "Waktu (HH.MM)",
+                  labelStyle: TextStyle(color: theme.subtextColor),
+                  prefixIcon: Icon(
+                    Icons.access_time_rounded,
+                    color: AppTheme.darkBlueMedium,
+                  ),
+                  filled: true,
+                  fillColor: isDarkMode
+                      ? const Color(0xFF0A0E27)
+                      : const Color(0xFFF8F9FE),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: BorderSide.none,
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: BorderSide(
+                      color: AppTheme.darkBlueMedium,
+                      width: 2,
+                    ),
+                  ),
+                ),
                 keyboardType: TextInputType.datetime,
               ),
-              const SizedBox(height: 12),
+              const SizedBox(height: 16),
               TextField(
                 controller: activityController,
-                decoration: const InputDecoration(labelText: "Aktivitas"),
+                style: TextStyle(color: theme.textColor),
+                decoration: InputDecoration(
+                  labelText: "Aktivitas",
+                  labelStyle: TextStyle(color: theme.subtextColor),
+                  prefixIcon: Icon(
+                    Icons.event_note_rounded,
+                    color: AppTheme.darkCyan,
+                  ),
+                  filled: true,
+                  fillColor: isDarkMode
+                      ? const Color(0xFF0A0E27)
+                      : const Color(0xFFF8F9FE),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: BorderSide.none,
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: BorderSide(color: AppTheme.darkCyan, width: 2),
+                  ),
+                ),
               ),
             ],
           ),
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(context),
-              child: const Text("Batal"),
+              style: TextButton.styleFrom(
+                foregroundColor: theme.subtextColor,
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 20,
+                  vertical: 12,
+                ),
+              ),
+              child: const Text(
+                "Batal",
+                style: TextStyle(fontWeight: FontWeight.w600),
+              ),
             ),
-            ElevatedButton(
-              onPressed: () {
-                if (timeController.text.isNotEmpty &&
-                    activityController.text.isNotEmpty) {
-                  // Tambahkan data baru ke dailySchedule (di memori)
-                  setState(() {
-                    dailySchedule.add({
-                      "time": timeController.text,
-                      "activity": activityController.text,
-                      "icon": Icons.event, // Default icon untuk item baru
+            Container(
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  colors: [AppTheme.darkBlueMedium, AppTheme.darkCyan],
+                ),
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: ElevatedButton(
+                onPressed: () {
+                  if (timeController.text.isNotEmpty &&
+                      activityController.text.isNotEmpty) {
+                    setState(() {
+                      dailySchedule.add({
+                        "time": timeController.text,
+                        "activity": activityController.text,
+                        "icon": Icons.event,
+                      });
                     });
-                  });
-                  Navigator.pop(context);
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text("Jadwal baru ditambahkan!")),
-                  );
-                }
-              },
-              child: const Text("Tambah"),
+                    Navigator.pop(context);
+                    _showCustomSnackBar("Jadwal baru ditambahkan! ✨");
+                  }
+                },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.transparent,
+                  foregroundColor: Colors.white,
+                  shadowColor: Colors.transparent,
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 24,
+                    vertical: 12,
+                  ),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  elevation: 0,
+                ),
+                child: const Text(
+                  "Tambah",
+                  style: TextStyle(fontWeight: FontWeight.bold),
+                ),
+              ),
             ),
           ],
         );
@@ -69,141 +198,317 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
     );
   }
 
-  // Metode untuk menghapus jadwal (dipanggil dari panah)
   void _deleteScheduleItem(int index) {
     setState(() {
       dailySchedule.removeAt(index);
     });
-    ScaffoldMessenger.of(
-      context,
-    ).showSnackBar(const SnackBar(content: Text("Jadwal dihapus sementara.")));
+    _showCustomSnackBar("Jadwal dihapus");
+  }
+
+  void _showCustomSnackBar(String message) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Row(
+          children: [
+            const Icon(
+              Icons.check_circle_rounded,
+              color: Colors.white,
+              size: 20,
+            ),
+            const SizedBox(width: 12),
+            Text(
+              message,
+              style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 14),
+            ),
+          ],
+        ),
+        backgroundColor: AppTheme.accentGreen,
+        behavior: SnackBarBehavior.floating,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+        margin: const EdgeInsets.all(16),
+        duration: const Duration(seconds: 2),
+      ),
+    );
   }
 
   @override
   Widget build(BuildContext context) {
-    // Tema dinamis diambil dari DashboardState
     final isDarkMode = DashboardScreenState.getDarkMode;
-    final bgColor = isDarkMode
-        ? const Color(0xFF121212)
-        : const Color(0xFFF5F5F5);
-    final cardColor = isDarkMode ? const Color(0xFF1E1E1E) : Colors.white;
-    final textColor = isDarkMode ? Colors.white : Colors.black87;
-    final subtextColor = isDarkMode ? Colors.white70 : Colors.black54;
+    final theme = AppTheme.getTheme(isDarkMode);
 
     return Scaffold(
-      backgroundColor: bgColor,
-      appBar: AppBar(
-        title: const Text("Semua Jadwal"),
-        backgroundColor: cardColor,
-        elevation: 1, // Beri sedikit elevasi agar terlihat jelas
-        iconTheme: IconThemeData(color: textColor),
-        titleTextStyle: TextStyle(
-          color: textColor,
-          fontSize: 20,
-          fontWeight: FontWeight.bold,
-        ),
-        actions: [
-          // Tombol TAMBAH JADWAL BARU
-          IconButton(
-            icon: const Icon(Icons.add_circle_outline_rounded, size: 24),
-            color: Colors.blue.shade400,
-            onPressed: _addScheduleItem,
-          ),
-        ],
-      ),
-      body: ListView.builder(
-        padding: const EdgeInsets.all(16),
-        itemCount: dailySchedule.length,
-        itemBuilder: (context, index) {
-          final item = dailySchedule[index];
-          return Container(
-            margin: const EdgeInsets.only(bottom: 12),
-            decoration: BoxDecoration(
-              color: cardColor,
-              borderRadius: BorderRadius.circular(16),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withOpacity(0.05),
-                  blurRadius: 10,
-                  offset: const Offset(0, 2),
-                ),
-              ],
-            ),
-            child: Material(
-              color: Colors.transparent,
-              child: InkWell(
-                borderRadius: BorderRadius.circular(16),
-                // Navigasi ke detail saat seluruh item di-tap
-                onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => DetailScheduleScreen(
-                        scheduleItem: item,
-                        index:
-                            index, // Kirim index untuk fungsi Hapus di Detail
-                        deleteCallback:
-                            _deleteScheduleItem, // Kirim callback hapus
-                      ),
+      backgroundColor: theme.bgColor,
+      body: CustomScrollView(
+        physics: const BouncingScrollPhysics(),
+        slivers: [
+          // App Bar dengan gradient
+          SliverAppBar(
+            expandedHeight: 160,
+            floating: false,
+            pinned: true,
+            elevation: 0,
+            backgroundColor: Colors.transparent,
+            leading: IconButton(
+              icon: Container(
+                padding: const EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  color: Colors.white.withValues(alpha: 0.2),
+                  borderRadius: BorderRadius.circular(12),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withValues(alpha: 0.1),
+                      blurRadius: 8,
+                      offset: const Offset(0, 2),
                     ),
-                  );
-                },
-                child: Padding(
-                  padding: const EdgeInsets.all(16),
-                  child: Row(
-                    children: [
-                      // Icon dan Waktu (Kiri)
-                      Container(
-                        padding: const EdgeInsets.all(8),
-                        decoration: BoxDecoration(
-                          color: Colors.blue.withOpacity(0.1),
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        child: Icon(
-                          item["icon"],
-                          color: Colors.blue.shade400,
-                          size: 28,
-                        ),
+                  ],
+                ),
+                child: const Icon(
+                  Icons.arrow_back_ios_new_rounded,
+                  color: Colors.white,
+                  size: 20,
+                ),
+              ),
+              onPressed: () => Navigator.pop(context),
+            ),
+            actions: [
+              Padding(
+                padding: const EdgeInsets.only(right: 16),
+                child: Container(
+                  decoration: BoxDecoration(
+                    color: Colors.white.withValues(alpha: 0.2),
+                    borderRadius: BorderRadius.circular(12),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withValues(alpha: 0.1),
+                        blurRadius: 8,
+                        offset: const Offset(0, 2),
                       ),
-                      const SizedBox(width: 16),
-
-                      // Aktivitas (Tengah)
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
+                    ],
+                  ),
+                  child: IconButton(
+                    icon: const Icon(
+                      Icons.add_circle_outline_rounded,
+                      color: Colors.white,
+                      size: 24,
+                    ),
+                    onPressed: _addScheduleItem,
+                  ),
+                ),
+              ),
+            ],
+            flexibleSpace: FlexibleSpaceBar(
+              background: Container(
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                    colors: theme.gradientColors,
+                  ),
+                ),
+                child: SafeArea(
+                  child: Padding(
+                    padding: const EdgeInsets.fromLTRB(24, 60, 24, 24),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      children: [
+                        Row(
                           children: [
-                            Text(
-                              item["activity"]!,
-                              style: TextStyle(
-                                fontSize: 16,
-                                fontWeight: FontWeight.w600,
-                                color: textColor,
+                            Container(
+                              padding: const EdgeInsets.all(12),
+                              decoration: BoxDecoration(
+                                color: Colors.white.withValues(alpha: 0.2),
+                                borderRadius: BorderRadius.circular(16),
+                              ),
+                              child: const Icon(
+                                Icons.calendar_today_rounded,
+                                color: Colors.white,
+                                size: 24,
                               ),
                             ),
-                            Text(
-                              item["time"]!,
-                              style: TextStyle(
-                                fontSize: 13,
-                                color: subtextColor,
+                            const SizedBox(width: 12),
+                            const Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    "Semua Jadwal",
+                                    style: AppTheme.headerTitleStyle,
+                                  ),
+                                ],
                               ),
                             ),
                           ],
                         ),
-                      ),
-
-                      // Panah (Kanan)
-                      Icon(
-                        Icons.arrow_forward_ios_rounded,
-                        size: 16,
-                        color: subtextColor,
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
                 ),
               ),
             ),
-          );
-        },
+          ),
+
+          // Content
+          SliverPadding(
+            padding: const EdgeInsets.all(16),
+            sliver: dailySchedule.isEmpty
+                ? SliverFillRemaining(child: _buildEmptyState(theme))
+                : SliverList(
+                    delegate: SliverChildBuilderDelegate((context, index) {
+                      return buildAnimatedCard(
+                        delay: index * 50,
+                        child: _buildScheduleItem(
+                          dailySchedule[index],
+                          index,
+                          theme,
+                        ),
+                      );
+                    }, childCount: dailySchedule.length),
+                  ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildEmptyState(AppThemeData theme) {
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Container(
+            padding: const EdgeInsets.all(32),
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                colors: [
+                  AppTheme.darkBlueMedium.withValues(alpha: 0.2),
+                  AppTheme.darkCyan.withValues(alpha: 0.2),
+                ],
+              ),
+              shape: BoxShape.circle,
+            ),
+            child: Icon(
+              Icons.event_busy_rounded,
+              size: 80,
+              color: AppTheme.darkCyan,
+            ),
+          ),
+          const SizedBox(height: 24),
+          Text(
+            "Belum Ada Jadwal",
+            style: TextStyle(
+              fontSize: 22,
+              fontWeight: FontWeight.bold,
+              color: theme.textColor,
+            ),
+          ),
+          const SizedBox(height: 8),
+          Text(
+            "Tap tombol + di atas untuk menambah jadwal",
+            style: TextStyle(fontSize: 14, color: theme.subtextColor),
+            textAlign: TextAlign.center,
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildScheduleItem(
+    Map<String, dynamic> item,
+    int index,
+    AppThemeData theme,
+  ) {
+    return Container(
+      margin: const EdgeInsets.only(bottom: 12),
+      decoration: AppTheme.cardDecoration(
+        cardColor: theme.cardColor,
+        isDarkMode: theme.bgColor == const Color(0xFF0A0E27),
+      ),
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          borderRadius: BorderRadius.circular(20),
+          onTap: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => DetailScheduleScreen(
+                  scheduleItem: item,
+                  index: index,
+                  deleteCallback: _deleteScheduleItem,
+                ),
+              ),
+            );
+          },
+          child: Padding(
+            padding: const EdgeInsets.all(16),
+            child: Row(
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(14),
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      colors: AppTheme.scheduleCardGradient(
+                        theme.bgColor == const Color(0xFF0A0E27),
+                      ),
+                    ),
+                    borderRadius: BorderRadius.circular(16),
+                  ),
+                  child: Icon(item["icon"], color: AppTheme.darkCyan, size: 26),
+                ),
+                const SizedBox(width: 16),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        item["activity"]!,
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w600,
+                          color: theme.textColor,
+                        ),
+                      ),
+                      const SizedBox(height: 6),
+                      Row(
+                        children: [
+                          Icon(
+                            Icons.access_time_rounded,
+                            size: 14,
+                            color: theme.subtextColor,
+                          ),
+                          const SizedBox(width: 4),
+                          Text(
+                            item["time"]!,
+                            style: TextStyle(
+                              fontSize: 13,
+                              color: theme.subtextColor,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+                Container(
+                  padding: const EdgeInsets.all(8),
+                  decoration: BoxDecoration(
+                    color: theme.bgColor == const Color(0xFF0A0E27)
+                        ? Colors.white.withValues(alpha: 0.05)
+                        : Colors.grey.withValues(alpha: 0.1),
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  child: Icon(
+                    Icons.arrow_forward_ios_rounded,
+                    size: 16,
+                    color: theme.subtextColor,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
       ),
     );
   }

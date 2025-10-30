@@ -5,7 +5,7 @@ import '../models/berita.dart';
 class DetailBeritaScreen extends StatelessWidget {
   final Berita berita;
 
-  const DetailBeritaScreen({Key? key, required this.berita}) : super(key: key);
+  const DetailBeritaScreen({super.key, required this.berita});
 
   @override
   Widget build(BuildContext context) {

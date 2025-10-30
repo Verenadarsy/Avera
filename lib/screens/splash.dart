@@ -80,7 +80,7 @@ class _SplashScreenState extends State<SplashScreen>
                         shape: BoxShape.circle,
                         boxShadow: [
                           BoxShadow(
-                            color: Colors.blue.withOpacity(0.3),
+                            color: Colors.blue.withValues(alpha: 0.3),
                             blurRadius: 20,
                             spreadRadius: 5,
                           ),
@@ -94,10 +94,6 @@ class _SplashScreenState extends State<SplashScreen>
                           backgroundImage: AssetImage(
                             'assets/images/Profile.jpg',
                           ),
-                          // Fallback jika gambar tidak ditemukan
-                          onBackgroundImageError: (exception, stackTrace) {
-                            print('Error loading image');
-                          },
                           child: Container(), // Placeholder kosong
                         ),
                       ),
@@ -125,11 +121,11 @@ class _SplashScreenState extends State<SplashScreen>
                       vertical: 15,
                     ),
                     decoration: BoxDecoration(
-                      color: Colors.white.withOpacity(0.9),
+                      color: Colors.white.withValues(alpha: 0.9),
                       borderRadius: BorderRadius.circular(15),
                       boxShadow: [
                         BoxShadow(
-                          color: Colors.black.withOpacity(0.1),
+                          color: Colors.black.withValues(alpha: 0.1),
                           blurRadius: 10,
                           offset: const Offset(0, 5),
                         ),
